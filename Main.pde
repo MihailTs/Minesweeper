@@ -91,10 +91,10 @@ byte findAdjasentMines(int i, int j){
   }
   if(j == 0){
     if(grid[i-1][j].mine) cnt++; 
-    if(grid[i+1][j+1].mine) cnt++; 
+    if(grid[i+1][j].mine) cnt++; 
     if(grid[i][j+1].mine) cnt++; 
     if(grid[i+1][j+1].mine) cnt++; 
-    if(grid[i+1][j].mine) cnt++; 
+    if(grid[i-1][j+1].mine) cnt++; 
     return cnt;
   }
   if(j == cols-1){
