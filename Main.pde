@@ -1,28 +1,36 @@
 Field grid[][];
 int spaceLR = 30; float spaceUD;
 int side;
-int rows, cols;
+int cols, rows;
 float mineDensity = 5.5;
+
 void setup(){
   fullScreen();
   orientation(PORTRAIT); 
-  rows = 10;
-  cols = 20;
+  cols = 10;
+  rows = 20;
   side = (width-2*spaceLR)/10;
   spaceUD = (height-20*side)/2;
-  grid = new Field[rows][cols];
+  grid = new Field[cols][rows];
   
-  for(int i = 0; i < rows; i++)
-    for(int j = 0; j < cols; j++)
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
+          
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
   
 }
 
 void draw(){
   background(150);
-  for(int i = 0; i < rows; i++)
-    for(int j = 0; j < cols; j++)
+  for(int i = 0; i < cols; i++){
+    for(int j = 0; j < rows; j++){
         grid[i][j].show();
+        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
+    }
+  }
   noLoop();
 }
 
@@ -35,6 +43,99 @@ void mousePressed(){
   if(mouseY > spaceUD && mouseY < height-spaceUD){
     y = round(mouseY/side)-2;
   }
-  if(x != -1 && y != -1) grid[x][y].setOpen();
+  if(x != -1 && y != -1){
+    if(grid[x][y].getAdjNumber() == 0){
+      grid[x][y].setOpen();  
+      collapse(x, y);
+    }
+    else grid[x][y].setOpen();
+  }
+  
   loop();
+}
+
+void collapse(int i, int j){
+  if(grid[i][j].getAdjNumber() != 0) return;
+  if(inGrid(i-1, j-1) && !grid[i-1][j-1].isOpen()) {grid[i-1][j-1].setOpen(); collapse(i-1, j-1);}
+  if(inGrid(i-1, j) && !grid[i-1][j].isOpen()) {grid[i-1][j].setOpen(); collapse(i-1, j);}
+  if(inGrid(i-1, j+1) && !grid[i-1][j+1].isOpen()) {grid[i-1][j+1].setOpen(); collapse(i-1, j+1);}
+  if(inGrid(i, j-1) && !grid[i][j-1].isOpen()) {grid[i][j-1].setOpen(); collapse(i, j-1);}
+  if(inGrid(i, j+1) && !grid[i][j+1].isOpen()) {grid[i][j+1].setOpen(); collapse(i, j+1);}
+  if(inGrid(i+1, j-1) && !grid[i+1][j-1].isOpen()) {grid[i+1][j-1].setOpen(); collapse(i+1, j-1);}
+  if(inGrid(i+1, j) && !grid[i+1][j].isOpen()) {grid[i+1][j].setOpen(); collapse(i+1, j);}
+  if(inGrid(i+1, j+1) && !grid[i+1][j+1].isOpen()) {grid[i+1][j+1].setOpen(); collapse(i+1, j+1);}
+}
+
+boolean inGrid(int i, int j){
+   return i >= 0 && j >= 0 && i < cols && j < rows; 
+}
+
+byte findAdjasentMines(int i, int j){
+  byte cnt = 0;
+  if(i == 0 && j == 0){
+     if(grid[i+1][j].mine) cnt++; 
+     if(grid[i+1][j+1].mine) cnt++; 
+     if(grid[i][j+1].mine) cnt++; 
+     return cnt;
+  }
+  if(i == cols-1 && j == 0){
+     if(grid[i-1][j].mine) cnt++; 
+     if(grid[i-1][j+1].mine) cnt++; 
+     if(grid[i][j+1].mine) cnt++; 
+     return cnt;
+  }
+  if(i == 0 && j == rows-1){
+     if(grid[i+1][j].mine) cnt++; 
+     if(grid[i][j-1].mine) cnt++; 
+     if(grid[i+1][j-1].mine) cnt++; 
+     return cnt;
+  }
+  if(i == cols-1 && j == rows-1){
+     if(grid[i-1][j].mine) cnt++; 
+     if(grid[i-1][j-1].mine) cnt++; 
+     if(grid[i][j-1].mine) cnt++; 
+     return cnt;
+  }
+  if(i == 0){
+    if(grid[i][j+1].mine) cnt++; 
+    if(grid[i][j-1].mine) cnt++; 
+    if(grid[i+1][j-1].mine) cnt++; 
+    if(grid[i+1][j+1].mine) cnt++; 
+    if(grid[i+1][j].mine) cnt++; 
+    return cnt;
+  }
+  if(i == cols-1){
+    if(grid[i][j+1].mine) cnt++; 
+    if(grid[i][j-1].mine) cnt++; 
+    if(grid[i-1][j-1].mine) cnt++; 
+    if(grid[i-1][j+1].mine) cnt++; 
+    if(grid[i-1][j].mine) cnt++; 
+    return cnt;
+  }
+  if(j == 0){
+    if(grid[i-1][j].mine) cnt++; 
+    if(grid[i+1][j].mine) cnt++; 
+    if(grid[i][j+1].mine) cnt++; 
+    if(grid[i+1][j+1].mine) cnt++; 
+    if(grid[i-1][j+1].mine) cnt++; 
+    return cnt;
+  }
+  if(j == rows-1){
+    if(grid[i-1][j].mine) cnt++; 
+    if(grid[i+1][j].mine) cnt++; 
+    if(grid[i-1][j-1].mine) cnt++; 
+    if(grid[i][j-1].mine) cnt++; 
+    if(grid[i+1][j-1].mine) cnt++; 
+    return cnt;
+  }
+  
+  if(grid[i-1][j-1].mine) cnt++; 
+  if(grid[i-1][j].mine) cnt++; 
+  if(grid[i-1][j+1].mine) cnt++; 
+  if(grid[i][j-1].mine) cnt++; 
+  if(grid[i][j+1].mine) cnt++; 
+  if(grid[i+1][j-1].mine) cnt++; 
+  if(grid[i+1][j].mine) cnt++; 
+  if(grid[i+1][j+1].mine) cnt++; 
+  return cnt;
 }
