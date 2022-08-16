@@ -36,6 +36,14 @@ class Field{
     open = true; 
   }
   
+  boolean isOpen(){
+    return open; 
+  }
+  
+  byte getAdjNumber(){
+    return adjMines; 
+  } 
+  
   boolean isMine(){
     return mine;
   }
