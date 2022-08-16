@@ -4,6 +4,9 @@ int side;
 int cols, rows;
 float mineDensity = 5.5;
 
+String icons[];
+PImage restartIcon;
+
 void setup(){
   fullScreen();
   orientation(PORTRAIT); 
@@ -11,30 +14,45 @@ void setup(){
   rows = 20;
   side = (width-2*spaceLR)/10;
   spaceUD = (height-20*side)/2;
-  grid = new Field[cols][rows];
   
+  icons = new String[]{"R2D2.png", "BB8.png", "BobaFett.png", "DarthVader.png", "KyloRen.png", "Logo1.png",
+  "Logo2.png", "Logo3.png", "PodRacer.png", "Stormtrooper.png"};
+  
+  restartIcon = loadImage(icons[floor(random(10))]);
+  
+  grid = new Field[cols][rows];
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          
+  
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
-        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
+          if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
   
 }
 
 void draw(){
   background(150);
+  stroke(255, 56, 26); 
   for(int i = 0; i < cols; i++){
     for(int j = 0; j < rows; j++){
         grid[i][j].show();
         if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
     }
   }
+  
+  image(restartIcon, (width-side)/2, (spaceUD-side)/2);
+  noFill(); square((width-side)/2, (spaceUD-side)/2, side);
+  
   noLoop();
 }
 
 void mousePressed(){
+  
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
+  }
+  
   int x = -1;
   if(mouseX > spaceLR && mouseX < width-spaceLR){
     x = round((mouseX-spaceLR)/side);
@@ -138,4 +156,15 @@ byte findAdjasentMines(int i, int j){
   if(grid[i+1][j].mine) cnt++; 
   if(grid[i+1][j+1].mine) cnt++; 
   return cnt;
+}
+
+void restart(){
+  grid = new Field[cols][rows];
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+          grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
+  
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+          if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
 }
