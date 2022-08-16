@@ -3,6 +3,7 @@ int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
 float mineDensity = 5.5;
+
 PImage restartIcon;
 
 void setup(){
@@ -12,9 +13,20 @@ void setup(){
   rows = 20;
   side = (width-2*spaceLR)/10;
   spaceUD = (height-20*side)/2;
+
   restartIcon = loadImage("RestartIcon.png");
   
   restart();
+
+  grid = new Field[cols][rows];
+  
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+          grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
+          
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));  
   
 }
 
@@ -26,10 +38,10 @@ void draw(){
         if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
     }
   }
-  
+
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   stroke(255, 56, 26); noFill(); square((width-side)/2, (spaceUD-side)/2, side);
-  
+ 
   noLoop();
 }
 

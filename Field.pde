@@ -23,6 +23,7 @@ class Field{
        else fill(234, 232, 192);
        square(SPACELR+x*side, SPACEUD+y*side, side);
      if(mine) {
+       PImage img = loadImage("Flag.png");
        image(img, SPACELR+x*side, SPACEUD+y*side);}
      else {
        if(adjMines > 0){
