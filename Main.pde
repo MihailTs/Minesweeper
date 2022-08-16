@@ -3,6 +3,7 @@ int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
 float mineDensity = 5.5;
+PImage restartIcon;
 
 void setup(){
   fullScreen();
@@ -11,15 +12,9 @@ void setup(){
   rows = 20;
   side = (width-2*spaceLR)/10;
   spaceUD = (height-20*side)/2;
-  grid = new Field[cols][rows];
+  restartIcon = loadImage("RestartIcon.png");
   
-  for(int i = 0; i < cols; i++)
-    for(int j = 0; j < rows; j++)
-          grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          
-  for(int i = 0; i < cols; i++)
-    for(int j = 0; j < rows; j++)
-        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
+  restart();
   
 }
 
@@ -31,10 +26,19 @@ void draw(){
         if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
     }
   }
+  
+  image(restartIcon, (width-side)/2, (spaceUD-side)/2);
+  stroke(255, 56, 26); noFill(); square((width-side)/2, (spaceUD-side)/2, side);
+  
   noLoop();
 }
 
 void mousePressed(){
+  
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
+  }
+  
   int x = -1;
   if(mouseX > spaceLR && mouseX < width-spaceLR){
     x = round((mouseX-spaceLR)/side);
@@ -138,4 +142,19 @@ byte findAdjasentMines(int i, int j){
   if(grid[i+1][j].mine) cnt++; 
   if(grid[i+1][j+1].mine) cnt++; 
   return cnt;
+}
+
+void restart(){
+  
+  grid = new Field[cols][rows];
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+          grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
+          
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
+        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
+  
+  
+  
 }
