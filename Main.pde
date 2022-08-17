@@ -1,52 +1,62 @@
+import ketai.ui.*;
+
 Field grid[][];
 int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
 float mineDensity = 5.5;
 
+String icons[];
 PImage restartIcon;
+
+KetaiVibrate vibe;
+long[] pattern;
 
 void setup(){
   fullScreen();
-  orientation(PORTRAIT); 
+  orientation(PORTRAIT);
+  
   cols = 10;
   rows = 20;
   side = (width-2*spaceLR)/10;
   spaceUD = (height-20*side)/2;
-
-  restartIcon = loadImage("RestartIcon.png");
   
-  restart();
-
+  vibe = new KetaiVibrate(this);
+  pattern = new long[]{0, 30};
+  
+  icons = new String[]{"R2D2.png", "BB8.png", "BobaFett.png", "DarthVader.png", "KyloRen.png", "Logo1.png",
+  "Logo2.png", "Logo3.png", "PodRacer.png", "Stormtrooper.png"};
+  
+  restartIcon = loadImage(icons[floor(random(10))]);
+  
   grid = new Field[cols][rows];
-  
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          
+  
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
-        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));  
+          if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
   
 }
 
 void draw(){
   background(150);
+  stroke(255, 56, 26); 
   for(int i = 0; i < cols; i++){
     for(int j = 0; j < rows; j++){
         grid[i][j].show();
         if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
     }
   }
-
+  
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
-  stroke(255, 56, 26); noFill(); square((width-side)/2, (spaceUD-side)/2, side);
- 
+  noFill(); square((width-side)/2, (spaceUD-side)/2, side);
+  
   noLoop();
 }
 
 void mousePressed(){
-  
   if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
       restart();
   }
@@ -59,6 +69,10 @@ void mousePressed(){
   if(mouseY > spaceUD && mouseY < height-spaceUD){
     y = round(mouseY/side)-2;
   }
+  
+  if(inGrid(x, y) && !grid[x][y].isOpen())
+    vibe.vibrate(pattern, -1); 
+  
   if(x != -1 && y != -1){
     if(grid[x][y].getAdjNumber() == 0){
       grid[x][y].setOpen();  
@@ -66,6 +80,8 @@ void mousePressed(){
     }
     else grid[x][y].setOpen();
   }
+  
+  println(x + "  " + y);
   
   loop();
 }
@@ -157,16 +173,12 @@ byte findAdjasentMines(int i, int j){
 }
 
 void restart(){
-  
   grid = new Field[cols][rows];
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          
+  
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
-        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
-  
-  
-  
+          if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
 }
