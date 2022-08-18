@@ -7,12 +7,14 @@ class Field{
   boolean open; 
   byte adjMines;
   PFont font = loadFont("ArialRoundedMTBold-48.vlw");
+  PImage img;
   
   Field(float xoff, float yoff, float s, boolean m, float lr, float ud){
     x = xoff; y = yoff; side = s; mine = m;
     SPACELR = lr; SPACEUD = ud;
     open = false;
     adjMines = -1;
+    img = loadImage("Flag.png");
   }
   
   void show(){
@@ -21,7 +23,6 @@ class Field{
        else fill(234, 232, 192);
        square(SPACELR+x*side, SPACEUD+y*side, side);
      if(mine) {
-       PImage img = loadImage("Flag.png");
        image(img, SPACELR+x*side, SPACEUD+y*side);}
      else {
        if(adjMines > 0){
