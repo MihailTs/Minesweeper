@@ -6,6 +6,7 @@ int side;
 int cols, rows;
 float mineDensity = 5.5;
 
+
 int pressedX, pressedY;
 
 String icons[];
@@ -13,6 +14,11 @@ PImage restartIcon;
 
 KetaiVibrate vibe;
 long[] pattern;
+
+
+String icons[];
+PImage restartIcon;
+
 
 void setup(){
   fullScreen();
@@ -59,6 +65,11 @@ void draw(){
 }
 
 void mousePressed(){
+  
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
+  }
+  
   int x = -1;
   if(mouseX > spaceLR && mouseX < width-spaceLR){
     x = round((mouseX-spaceLR)/side);
