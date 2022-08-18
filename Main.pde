@@ -6,6 +6,8 @@ int side;
 int cols, rows;
 float mineDensity = 5.5;
 
+int pressedX, pressedY;
+
 String icons[];
 PImage restartIcon;
 
@@ -57,6 +59,22 @@ void draw(){
 }
 
 void mousePressed(){
+  int x = -1;
+  if(mouseX > spaceLR && mouseX < width-spaceLR){
+    x = round((mouseX-spaceLR)/side);
+  }
+  int y = -1;
+  if(mouseY > spaceUD && mouseY < height-spaceUD){
+    y = round(mouseY/side)-2;
+  }
+  pressedX = x;
+  pressedY = y;
+  if(inGrid(x, y) && !grid[x][y].isOpen())
+    vibe.vibrate(pattern, -1); 
+}
+
+void mouseReleased(){
+  
   if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
       restart();
   }
@@ -70,8 +88,7 @@ void mousePressed(){
     y = round(mouseY/side)-2;
   }
   
-  if(inGrid(x, y) && !grid[x][y].isOpen())
-    vibe.vibrate(pattern, -1); 
+  if(x != pressedX || y != pressedY) return;
   
   if(x != -1 && y != -1){
     if(grid[x][y].getAdjNumber() == 0){
