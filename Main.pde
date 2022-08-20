@@ -16,6 +16,9 @@ long[] pattern;
 
 long m = 0;
 
+String icons[];
+PImage restartIcon;
+
 void setup(){
   fullScreen();
   orientation(PORTRAIT);
@@ -62,6 +65,10 @@ void draw(){
 
 void mousePressed(){
   
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
+  }
+  
   int x = -1;
   if(mouseX > spaceLR && mouseX < width-spaceLR){
     x = round((mouseX-spaceLR)/side);
@@ -80,6 +87,21 @@ void mousePressed(){
 }
 
 void mouseReleased(){
+  
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
+  }
+  
+  int x = -1;
+  if(mouseX > spaceLR && mouseX < width-spaceLR){
+    x = round((mouseX-spaceLR)/side);
+  }
+  int y = -1;
+  if(mouseY > spaceUD && mouseY < height-spaceUD){
+    y = round(mouseY/side)-2;
+  }
+  
+  if(x != pressedX || y != pressedY) return;
   
   if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
       restart();
