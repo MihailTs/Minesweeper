@@ -6,7 +6,6 @@ int side;
 int cols, rows;
 float mineDensity = 5.5;
 
-
 int pressedX, pressedY;
 
 String icons[];
@@ -15,10 +14,10 @@ PImage restartIcon;
 KetaiVibrate vibe;
 long[] pattern;
 
+long m = 0;
 
 String icons[];
 PImage restartIcon;
-
 
 void setup(){
   fullScreen();
@@ -60,7 +59,7 @@ void draw(){
   
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
-  
+    
   noLoop();
 }
 
@@ -82,6 +81,9 @@ void mousePressed(){
   pressedY = y;
   if(inGrid(x, y) && !grid[x][y].isOpen())
     vibe.vibrate(pattern, -1); 
+    
+  if(m == 0) m = millis();
+    
 }
 
 void mouseReleased(){
@@ -101,27 +103,48 @@ void mouseReleased(){
   
   if(x != pressedX || y != pressedY) return;
   
-  if(x != -1 && y != -1){
-    if(grid[x][y].getAdjNumber() == 0){
-      grid[x][y].setOpen();  
-      collapse(x, y);
-    }
-    else grid[x][y].setOpen();
+  if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side){
+      restart();
   }
+  
+  int x = -1;
+  if(mouseX > spaceLR && mouseX < width-spaceLR){
+    x = round((mouseX-spaceLR)/side);
+  }
+  int y = -1;
+  if(mouseY > spaceUD && mouseY < height-spaceUD){
+    y = round(mouseY/side)-2;
+  }
+  
+  if(x != pressedX || y != pressedY) return;
+  
+  if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) grid[x][y].mark();
+  else if(inGrid(x, y)){
+   if(grid[x][y].isMarked()) grid[x][y].unmark();
+   else if(!grid[x][y].isOpen()){
+      if(grid[x][y].getAdjNumber() == 0){
+        grid[x][y].setOpen();  
+        collapse(x, y);
+      }
+      else grid[x][y].setOpen();  
+   }
+  }
+
+   m = 0;
   
   loop();
 }
 
 void collapse(int i, int j){
   if(grid[i][j].getAdjNumber() != 0) return;
-  if(inGrid(i-1, j-1) && !grid[i-1][j-1].isOpen()) {grid[i-1][j-1].setOpen(); collapse(i-1, j-1);}
-  if(inGrid(i-1, j) && !grid[i-1][j].isOpen()) {grid[i-1][j].setOpen(); collapse(i-1, j);}
-  if(inGrid(i-1, j+1) && !grid[i-1][j+1].isOpen()) {grid[i-1][j+1].setOpen(); collapse(i-1, j+1);}
-  if(inGrid(i, j-1) && !grid[i][j-1].isOpen()) {grid[i][j-1].setOpen(); collapse(i, j-1);}
-  if(inGrid(i, j+1) && !grid[i][j+1].isOpen()) {grid[i][j+1].setOpen(); collapse(i, j+1);}
-  if(inGrid(i+1, j-1) && !grid[i+1][j-1].isOpen()) {grid[i+1][j-1].setOpen(); collapse(i+1, j-1);}
-  if(inGrid(i+1, j) && !grid[i+1][j].isOpen()) {grid[i+1][j].setOpen(); collapse(i+1, j);}
-  if(inGrid(i+1, j+1) && !grid[i+1][j+1].isOpen()) {grid[i+1][j+1].setOpen(); collapse(i+1, j+1);}
+  if(inGrid(i-1, j-1) && !grid[i-1][j-1].isOpen() && !grid[i-1][j-1].isMarked()) {grid[i-1][j-1].setOpen(); collapse(i-1, j-1);}
+  if(inGrid(i-1, j) && !grid[i-1][j].isOpen() && !grid[i-1][j].isMarked()) {grid[i-1][j].setOpen(); collapse(i-1, j);}
+  if(inGrid(i-1, j+1) && !grid[i-1][j+1].isOpen() && !grid[i-1][j+1].isMarked()) {grid[i-1][j+1].setOpen(); collapse(i-1, j+1);}
+  if(inGrid(i, j-1) && !grid[i][j-1].isOpen() && !grid[i][j-1].isMarked()) {grid[i][j-1].setOpen(); collapse(i, j-1);}
+  if(inGrid(i, j+1) && !grid[i][j+1].isOpen() && !grid[i][j+1].isMarked()) {grid[i][j+1].setOpen(); collapse(i, j+1);}
+  if(inGrid(i+1, j-1) && !grid[i+1][j-1].isOpen() && !grid[i+1][j-1].isMarked()) {grid[i+1][j-1].setOpen(); collapse(i+1, j-1);}
+  if(inGrid(i+1, j) && !grid[i+1][j].isOpen() && !grid[i+1][j].isMarked()) {grid[i+1][j].setOpen(); collapse(i+1, j);}
+  if(inGrid(i+1, j+1) && !grid[i+1][j+1].isOpen() && !grid[i+1][j+1].isMarked()) {grid[i+1][j+1].setOpen(); collapse(i+1, j+1);}
 }
 
 boolean inGrid(int i, int j){

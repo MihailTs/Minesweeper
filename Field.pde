@@ -4,26 +4,28 @@ class Field{
   float y;
   float side;
   boolean mine;
-  boolean open; 
+  byte state; 
   byte adjMines;
   PFont font = loadFont("ArialRoundedMTBold-48.vlw");
-  PImage img;
+  PImage flagImg, mineImg;
   
   Field(float xoff, float yoff, float s, boolean m, float lr, float ud){
     x = xoff; y = yoff; side = s; mine = m;
     SPACELR = lr; SPACEUD = ud;
-    open = false;
+    state = 0;
     adjMines = -1;
-    img = loadImage("Flag.png");
+    flagImg = loadImage("Flag.png");
+    mineImg = loadImage("Mine.png");
   }
   
   void show(){
-    if(open){
+    
+    if(state >= 1){
       if((x%2==0 && y%2==1) || (x%2==1 && y%2==0)) fill(247, 243, 150);
        else fill(234, 232, 192);
        square(SPACELR+x*side, SPACEUD+y*side, side);
-     if(mine) {
-       image(img, SPACELR+x*side, SPACEUD+y*side);}
+     if(mine) image(mineImg, SPACELR+x*side, SPACEUD+y*side);
+     else if(state == 2) image(flagImg, SPACELR+x*side, SPACEUD+y*side);
      else {
        if(adjMines > 0){
          textSize(50); textFont(font, 50); fill(52, 227, 18);
@@ -34,11 +36,11 @@ class Field{
   }
   
   void setOpen(){
-    open = true; 
+    state = 1; 
   }
   
   boolean isOpen(){
-    return open; 
+    return state==1; 
   }
   
   byte getAdjNumber(){
@@ -51,6 +53,18 @@ class Field{
   
   void setAdjNumber(byte n){
      adjMines = n;
+  }
+  
+  void mark(){
+     state = 2;
+  }
+  
+  void unmark(){
+     state = 0; 
+  }
+  
+  boolean isMarked(){
+     return state == 2; 
   }
   
 }
