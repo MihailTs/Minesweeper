@@ -109,8 +109,6 @@ void mouseReleased(){
     else grid[x][y].setOpen();
   }
   
-  println(x + "  " + y);
-  
   loop();
 }
 
