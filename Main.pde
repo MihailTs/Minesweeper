@@ -4,7 +4,7 @@ Field grid[][];
 int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
-float mineDensity = 7;
+float mineDensity = 6;
 
 int mineCnt;
 int markedCnt;
