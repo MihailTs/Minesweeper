@@ -4,7 +4,10 @@ Field grid[][];
 int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
-float mineDensity = 5;
+float mineDensity = 7;
+
+int mineCnt;
+int markedCnt;
 
 int pressedX, pressedY;
 
@@ -37,8 +40,10 @@ void setup(){
   
   grid = new Field[cols][rows];
   for(int i = 0; i < cols; i++)
-    for(int j = 0; j < rows; j++)
+    for(int j = 0; j < rows; j++){
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
+          if(grid[i][j].isMine()) mineCnt++;
+    }
   
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
@@ -58,10 +63,15 @@ void draw(){
   
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
-    
-  if(!gameOn) {
-      textSize(127); fill(255, 0, 0);
-      text("YOU LOSE", spaceLR, height/2); 
+
+  if(!gameOn){
+    if(mineCnt == 0) {
+        textSize(151); fill(34, 193, 14);
+        text("YOU WIN", spaceLR, height/2); 
+    }else{
+        textSize(127); fill(255, 0, 0);
+        text("YOU LOSE", spaceLR, height/2); 
+    }
   }
     
   noLoop();
@@ -102,7 +112,9 @@ void mouseReleased(){
     
     if(x != pressedX || y != pressedY) return;
     
-    if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) grid[x][y].mark();
+    if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) {
+      grid[x][y].mark();
+      if(grid[x][y].isMine()) mineCnt--;}
     else if(inGrid(x, y)){
      if(grid[x][y].isMarked()) grid[x][y].unmark();
      else if(!grid[x][y].isOpen()){
@@ -119,6 +131,7 @@ void mouseReleased(){
   
      m = 0;
   }
+  if(mineCnt == 0) gameover();
   loop();
 }
 
@@ -210,12 +223,15 @@ byte findAdjasentMines(int i, int j){
 
 void restart(){
   gameOn = true;
+  mineCnt = 0;
   
   grid = new Field[cols][rows];
   for(int i = 0; i < cols; i++)
-    for(int j = 0; j < rows; j++)
+    for(int j = 0; j < rows; j++){
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-  
+          if(grid[i][j].isMine()) mineCnt++;
+    }
+    
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++)
           if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
