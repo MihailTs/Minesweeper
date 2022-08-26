@@ -1,10 +1,13 @@
 import ketai.ui.*;
 
 Field grid[][];
+//space on the left, rightm up and down
 int spaceLR = 30; float spaceUD;
 int side;
 int cols, rows;
-float mineDensity = 6;
+
+//for easier game make it higher
+float mineDensity = 7;
 
 int mineCnt;
 int markedCnt;
@@ -17,6 +20,7 @@ PImage restartIcon;
 KetaiVibrate vibe;
 long[] pattern;
 
+//milliseconds counting how long the press lasted
 long m = 0;
 
 boolean gameOn = true;
@@ -54,13 +58,11 @@ void setup(){
 void draw(){
   background(150);
   stroke(255, 56, 26); 
-  for(int i = 0; i < cols; i++){
-    for(int j = 0; j < rows; j++){
+  for(int i = 0; i < cols; i++)
+    for(int j = 0; j < rows; j++)
         grid[i][j].show();
-        if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j));     
-    }
-  }
   
+  //add an icon to the restart button
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
 
@@ -89,6 +91,7 @@ void mousePressed(){
     }
     pressedX = x;
     pressedY = y;
+    
     if(inGrid(x, y) && !grid[x][y].isOpen())
       vibe.vibrate(pattern, -1); 
       
@@ -97,10 +100,12 @@ void mousePressed(){
 }
 
 void mouseReleased(){
-    
+   
+  //check if restart is clicked
   if(mouseX >= (width-side)/2 && mouseX <= (width-side)/2+side && mouseY >= (spaceUD-side)/2 && mouseY <= (spaceUD-side)/2+side) restart();
   
   if(gameOn){
+    //finding the coordinates of the pressed field
     int x = -1;
     if(mouseX > spaceLR && mouseX < width-spaceLR){
       x = round((mouseX-spaceLR)/side);
@@ -112,22 +117,7 @@ void mouseReleased(){
     
     if(x != pressedX || y != pressedY) return;
     
-    if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) {
-      grid[x][y].mark();
-      if(grid[x][y].isMine()) mineCnt--;}
-    else if(inGrid(x, y)){
-     if(grid[x][y].isMarked()) grid[x][y].unmark();
-     else if(!grid[x][y].isOpen()){
-        if(grid[x][y].getAdjNumber() == 0){
-          grid[x][y].setOpen();  
-          collapse(x, y);
-        }
-        else {
-          grid[x][y].setOpen();
-          if(grid[x][y].isMine()) {gameover(); loop(); return;}
-        }
-     }
-    }
+    changeField(x, y);
   
      m = 0;
   }
@@ -136,6 +126,7 @@ void mouseReleased(){
 }
 
 void collapse(int i, int j){
+  //backtrack to every 'empty' field adjacent to the current one
   if(grid[i][j].getAdjNumber() != 0) return;
   if(inGrid(i-1, j-1) && !grid[i-1][j-1].isOpen() && !grid[i-1][j-1].isMarked()) {grid[i-1][j-1].setOpen(); collapse(i-1, j-1);}
   if(inGrid(i-1, j) && !grid[i-1][j].isOpen() && !grid[i-1][j].isMarked()) {grid[i-1][j].setOpen(); collapse(i-1, j);}
@@ -244,4 +235,27 @@ void gameover(){
       for(int j = 0; j < rows; j++)
          grid[i][j].setOpen();  
   
+}
+
+void changeField(int x, int y){
+  //check for every possible state of the field and take action for changing it
+  if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) {
+      grid[x][y].mark();
+      if(grid[x][y].isMine()) mineCnt--;}
+  else if(inGrid(x, y)){
+     if(grid[x][y].isMarked()){
+       if(grid[x][y].isMine()) mineCnt++;
+       grid[x][y].unmark();}
+     else if(!grid[x][y].isOpen()){
+       if(grid[x][y].getAdjNumber() == 0){
+         grid[x][y].setOpen();  
+         collapse(x, y);}
+       else {
+         grid[x][y].setOpen();
+         if(grid[x][y].isMine()) {
+           gameover(); loop(); return;
+         }
+       }
+     }
+  }
 }
