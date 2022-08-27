@@ -38,7 +38,7 @@ class Field{
       else if(mine) image(mineImg, SPACELR+x*side, SPACEUD+y*side);
       else {
         if(adjMines > 0){
-          textSize(50); textFont(font, 50); fill(52, 227, 18);
+          textSize(50); textFont(font, 50); changeFill(adjMines);
           text(adjMines, SPACELR+(x+0.285)*side, SPACEUD+(y+0.775)*side);}
       }
     }
@@ -76,6 +76,19 @@ class Field{
   
   boolean isMarked(){
      return state == 2; 
+  }
+  
+  void changeFill(byte a){
+    switch(a){
+      case 1: fill(52, 237, 18); break;
+      case 2: fill(237, 45, 225); break;
+      case 3: fill(108, 9, 224); break;
+      case 4: fill(222, 40, 68); break;
+      case 5: fill(30, 37, 165); break;
+      case 6: fill(188, 8, 2); break;
+      case 7: fill(255, 0, 0); break;
+      case 8: fill(95, 83, 83); break;
+    }
   }
   
 }
