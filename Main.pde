@@ -7,7 +7,7 @@ int side;
 int cols, rows;
 
 //for easier game make it higher
-float mineDensity = 7;
+float mineDensity = 6.5;
 
 int mineCnt;
 int markedCnt;
@@ -46,7 +46,7 @@ void setup(){
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++){
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          if(grid[i][j].isMine()) mineCnt++;
+          if(grid[i][j].isMine()) {mineCnt++; markedCnt++;}
     }
   
   for(int i = 0; i < cols; i++)
@@ -121,7 +121,8 @@ void mouseReleased(){
   
      m = 0;
   }
-  if(mineCnt == 0) gameover();
+  if(mineCnt == 0 && markedCnt == 0) gameover();
+  println(mineCnt + "  " + markedCnt);
   loop();
 }
 
@@ -214,13 +215,13 @@ byte findAdjasentMines(int i, int j){
 
 void restart(){
   gameOn = true;
-  mineCnt = 0;
+  mineCnt = 0; markedCnt = 0;
   
   grid = new Field[cols][rows];
   for(int i = 0; i < cols; i++)
     for(int j = 0; j < rows; j++){
           grid[i][j] = new Field(i, j, side, (random(mineDensity)<1)? true: false, spaceLR, spaceUD);
-          if(grid[i][j].isMine()) mineCnt++;
+          if(grid[i][j].isMine()) {mineCnt++; markedCnt++;}
     }
     
   for(int i = 0; i < cols; i++)
@@ -241,10 +242,12 @@ void changeField(int x, int y){
   //check for every possible state of the field and take action for changing it
   if(millis()-m >= 300 && inGrid(x, y) && !grid[x][y].isOpen()) {
       grid[x][y].mark();
-      if(grid[x][y].isMine()) mineCnt--;}
+      if(grid[x][y].isMine()) mineCnt--;
+      markedCnt--;}
   else if(inGrid(x, y)){
      if(grid[x][y].isMarked()){
        if(grid[x][y].isMine()) mineCnt++;
+       markedCnt++;
        grid[x][y].unmark();}
      else if(!grid[x][y].isOpen()){
        if(grid[x][y].getAdjNumber() == 0){
