@@ -66,6 +66,7 @@ void draw(){
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
 
+
   if(!gameOn){
     if(mineCnt == 0) {
         textSize(151); fill(34, 193, 14);
@@ -80,7 +81,8 @@ void draw(){
 }
 
 void mousePressed(){
-
+    m = millis();
+    
     int x = -1;
     if(mouseX > spaceLR && mouseX < width-spaceLR){
       x = round((mouseX-spaceLR)/side);
@@ -93,10 +95,7 @@ void mousePressed(){
     pressedY = y;
     
     if(inGrid(x, y) && !grid[x][y].isOpen())
-      vibe.vibrate(pattern, -1); 
-      
-    if(m == 0) m = millis();
-  
+      vibe.vibrate(pattern, -1);   
 }
 
 void mouseReleased(){
@@ -121,8 +120,7 @@ void mouseReleased(){
   
      m = 0;
   }
-  if(mineCnt == 0 && markedCnt == 0) gameover();
-  println(mineCnt + "  " + markedCnt);
+  if(mineCnt == 0 && markedCnt == 0) gameWon();
   loop();
 }
 
@@ -229,13 +227,20 @@ void restart(){
           if(!grid[i][j].isMine()) grid[i][j].setAdjNumber(findAdjasentMines(i, j)); 
 }
 
-void gameover(){
+void gameWon(){
+  gameOn = false;
+  
+  for(int i = 0; i < cols; i++)
+      for(int j = 0; j < rows; j++)
+        if(!grid[i][j].isMarked()) grid[i][j].setOpen();  
+}
+
+void gameLost(){
   gameOn = false;
   
   for(int i = 0; i < cols; i++)
       for(int j = 0; j < rows; j++)
          grid[i][j].setOpen();  
-  
 }
 
 void changeField(int x, int y){
@@ -256,7 +261,7 @@ void changeField(int x, int y){
        else {
          grid[x][y].setOpen();
          if(grid[x][y].isMine()) {
-           gameover(); loop(); return;
+           gameLost(); loop(); return;
          }
        }
      }
