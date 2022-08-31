@@ -22,6 +22,7 @@ long[] pattern;
 
 //milliseconds counting how long the press lasted
 long m = 0;
+int minutes;
 
 boolean gameOn = true;
 
@@ -66,6 +67,9 @@ void draw(){
   image(restartIcon, (width-side)/2, (spaceUD-side)/2);
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
 
+  //count of remaining mines
+  textSize(side); fill(255, 0, 0); 
+  text(markedCnt, 0.7*width, 0.7*spaceUD); 
 
   if(!gameOn){
     if(mineCnt == 0) {
