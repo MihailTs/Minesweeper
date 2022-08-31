@@ -81,10 +81,10 @@ void draw(){
   textFont(font, side);
   if(!gameOn){
     if(mineCnt == 0) {
-        textSize(145); fill(34, 193, 14);
+        textSize(rows*side/8); fill(34, 193, 14);
         text("YOU WIN", spaceLR, height/2); 
     }else{
-        textSize(145); fill(255, 0, 0);
+        textSize(rows*side/9); fill(255, 0, 0);
         text("YOU LOSE", spaceLR, height/2); 
     }
   }
