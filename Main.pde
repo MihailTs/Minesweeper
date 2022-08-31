@@ -25,6 +25,9 @@ long m = 0;
 int minutes;
 
 boolean gameOn = true;
+PImage mineImg;
+
+PFont font = createFont("ArialNarrow-Bold-48.vlw", 120);
 
 void setup(){
   fullScreen();
@@ -37,6 +40,8 @@ void setup(){
   
   vibe = new KetaiVibrate(this);
   pattern = new long[]{0, 30};
+  
+  mineImg = loadImage("Mine.png");
   
   icons = new String[]{"R2D2.png", "BB8.png", "BobaFett.png", "DarthVader.png", "KyloRen.png", "Logo1.png",
   "Logo2.png", "Logo3.png", "PodRacer.png", "Stormtrooper.png"};
@@ -68,15 +73,18 @@ void draw(){
   noFill(); square((width-side)/2, (spaceUD-side)/2, side);
 
   //count of remaining mines
-  textSize(side); fill(255, 0, 0); 
+  if(gameOn){
+  fill(255, 0, 0); textFont(font, side);
   text(markedCnt, 0.7*width, 0.7*spaceUD); 
+  image(mineImg, 0.7*width+1.2*side, 0.4*side);}
 
+  textFont(font, side);
   if(!gameOn){
     if(mineCnt == 0) {
-        textSize(151); fill(34, 193, 14);
+        textSize(145); fill(34, 193, 14);
         text("YOU WIN", spaceLR, height/2); 
     }else{
-        textSize(127); fill(255, 0, 0);
+        textSize(145); fill(255, 0, 0);
         text("YOU LOSE", spaceLR, height/2); 
     }
   }
